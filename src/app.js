@@ -1,11 +1,14 @@
 import express from "express";
+import cors from "cors";
 
-import { getAllTodos, getTodo, insertTodo, updateTodo } from "./db.js";
+import { getAllTodos, getTodo, insertTodo, updateTodo } from "./db.mjs";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.disable("x-powered-by");
+
+app.use(cors());
 app.use(express.json());
 
 app.get("/", (_req, res) => {
