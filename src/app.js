@@ -29,7 +29,7 @@ app.get("/authtest", auth, (req, res) => {
 
 app.get("/todos", auth, todosHandlers.allTodos);
 app.post("/todos", auth, todosHandlers.createTodo);
-app.put("/todos/:id", auth, todosHandlers.updateTodo);
+app.patch("/todos/:id", auth, todosHandlers.updateTodo);
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);

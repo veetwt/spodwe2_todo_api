@@ -16,7 +16,9 @@ database.exec("PRAGMA cache_size = 10000");
 const createTodosTable = `CREATE TABLE IF NOT EXISTS TODOS (
   id TEXT NOT NULL PRIMARY KEY,
   text TEXT NOT NULL,
-  done BOOLEAN NOT NULL DEFAULT 0
+  done BOOLEAN NOT NULL DEFAULT 0,
+  user_id TEXT NOT NULL,
+  FOREIGN KEY (user_id) REFERENCES USERS(id) ON DELETE CASCADE
 )`;
 
 const createUsersTable = `CREATE TABLE IF NOT EXISTS USERS (
@@ -26,13 +28,13 @@ const createUsersTable = `CREATE TABLE IF NOT EXISTS USERS (
   password TEXT NOT NULL
 )`;
 
-const insertSampleData = `INSERT INTO TODOS (id, text, done)
+const insertSampleData = `INSERT INTO TODOS (id, text, done, user_id)
   SELECT * FROM (
-    SELECT 'b1a8f3e2-7c4a-4f3b-9d6e-8f2d4c9a1b3e', 'Sample Todo 1', 0
+    SELECT 'b1a8f3e2-7c4a-4f3b-9d6e-8f2d4c9a1b3e', 'Sample Todo 1', 0, 1
     UNION ALL
-    SELECT 'd4e5c6f7-8a9b-4c2d-9e1f-7b3a6c8d5e4f', 'Sample Todo 2', 0
+    SELECT 'd4e5c6f7-8a9b-4c2d-9e1f-7b3a6c8d5e4f', 'Sample Todo 2', 0, 1
     UNION ALL
-    SELECT 'f9e8d7c6-5b4a-3f2e-1d9c-8a7b6e5c4f3d', 'Sample Todo 3', 0
+    SELECT 'f9e8d7c6-5b4a-3f2e-1d9c-8a7b6e5c4f3d', 'Sample Todo 3', 0, 1
   ) AS new_data 
     WHERE NOT EXISTS (SELECT 1 FROM TODOS)
 `;
@@ -71,14 +73,14 @@ const getUser = database.prepare(
 );
 
 const insertTodo = database.prepare(
-  "INSERT INTO TODOS (id, text, done) VALUES ($id, $text, 0) RETURNING id, text, done"
+  "INSERT INTO TODOS (id, text, done, user_id) VALUES ($id, $text, 0, $user_id) RETURNING id, text, done"
 );
 const updateTodo = database.prepare(
-  "UPDATE TODOS SET text = $text, done = $done WHERE id = $id RETURNING id, text, done"
+  "UPDATE TODOS SET text = $text, done = $done WHERE id = $id and user_id = $user_id RETURNING id, text, done"
 );
 const getTodo = database.prepare(
-  `SELECT id, text, done FROM TODOS WHERE id = $id`
+  `SELECT id, text, done FROM TODOS WHERE id = $id AND user_id = $user_id`
 );
-const getAllTodos = database.prepare(`SELECT id, text, done FROM TODOS`);
+const getAllTodos = database.prepare(`SELECT id, text, done FROM TODOS WHERE user_id = $user_id`);
 
 export { database, insertTodo, updateTodo, getTodo, getAllTodos, insertUser, getUser };
